@@ -1,0 +1,57 @@
+))
+
+var data={
+	"deptno":100,
+	"deptName":"开发部",
+	"loc":"杭州",
+	"count":10,
+	"money":10000
+}
+
+db.dept.insert({
+	"deptno":20,
+	"deptName":"市场部",
+	"loc":"上海"
+})
+
+
+db.dept.update({"_id" : ObjectId("59f91b82caf783814808956d")},data);
+db.students.insert({"name":"小张","age":20,"score":75,"address":"北京","sex":"男"});
+db.students.insert({"name":"张三","age":19,"score":98,"address":"北京","sex":"男"});
+db.students.insert({"name":"李四","age":20,"score":100,"address":"深圳","sex":"女"});
+db.students.insert({"name":"王五","age":21,"score":65,"address":"北京","sex":"男"});
+db.students.insert({"name":"赵六","age":20,"score":100,"address":"上海","sex":"女"});
+db.students.insert({"name":"孙七","age":19,"score":21,"address":"广州","sex":"女"});
+db.students.insert({"name":"王八","age":20,"score":85,"address":"广州","sex":"男"});
+db.students.insert({"name":"钱十","age":21,"score":95,"address":"上海","sex":"男"});
+db.students.insert({"name":"西西","age":20,"score":82,"address":"深圳","sex":"女"});
+db.students.insert({"name":"西西-1","age":20,"score":23,"address":"深圳","sex":"女","curse":["语文","数学","英语","音乐","体育"]});
+db.students.insert({"name":"西西-2","age":20,"score":23,"address":"深圳","sex":"女","curse":["英语","音乐","体育"]});
+db.students.insert({"name":"西西-3","age":20,"score":23,"address":"深圳","sex":"女","curse":["语文","数学","英语"]});
+db.students.insert({"name":"西西-4","age":20,"score":23,"address":"深圳","sex":"女","curse":["数学"]});
+db.students.insert({"name":"西西-5","age":20,"score":23,"address":"深圳","sex":"女","curse":["体育"]});
+db.students.insert({"name":"西西-6","age":20,"score":23,"address":"深圳","sex":"女","curse":["语文","数学"]});
+db.students.insert({"name":"西西-7","age":20,"score":23,"address":"深圳","sex":"女","curse":["音乐","体育"]});
+db.students.insert({"name":"西西-8","age":20,"score":23,"address":"深圳","sex":"女","curse":["英语"]});
+db.students.insert({"name":"西西-9","age":20,"score":23,"address":"深圳","sex":"女","curse":["语文","数学","音乐","体育"]});
+db.students.insert({"name":"西西-10","age":20,"score":23,"address":"深圳","sex":"女","curse":["语文","数学","英语","音乐","体育"]});
+
+
+		db.students.find({"name":"张三"}).pretty()
+		db.students.find({"score":{"$gt":80}}).pretty();
+
+
+		db.students.find({"score":{"$gt":80,"$lt":90}}).pretty();
+		db.students.find({"address":{"$ne":"广州"}}).pretty();
+		db.students.find({"$or":[{"age":{"$gt":19}},{"score":{"$gt":80}}]}).pretty();
+		db.students.find({"address":{"$in":["北京","上海"]}}).pretty();
+		db.students.find({"curse":{"$all":["语文","数学"]}}).pretty();
+		db.students.find({"curse.0":"英语"}).pretty();
+		db.students.find({"curse":{"$size":2}}).pretty();
+		db.students.find({"name":"西西"},{"_id":0,"name":1,"score":1,"age":1}).pretty();
+		db.students.find({"name":"西西"},{"_id":0,"score":1,"age":1}).pretty();
+
+
+
+
+)

@@ -1,0 +1,225 @@
+
+
+db.students.find().pretty()
+db.students.insert({"name":"陈张扬","age":20,"score":100,"favorate":["篮球","平平球","排球","羽毛球"]})
+
+db.students.find({"curse":{"$exists":true}}).pretty();
+
+db.students.find({"$where":"this.age>20"}).pretty();
+
+
+db.students.find({"name":/西/}).pretty()
+
+
+db.students.find().sort({"score":-1}).pretty();
+
+db.students.find().skip(1).limit(5).sort({"score":-1}).pretty();
+db.students.find({"name":"陈张扬"}).pretty()
+db.students.find({"name":{"$regex":/张扬/i}}).pretty()
+
+
+db.students.update({"name":"陈张杨"},{"$set":{"score":120}},false,false);
+db.students.update({"_id" : ObjectId("5a016f3a3cfbe16cd470b9d9")},{"$set":{"score":120}},false,false);
+db.students.update({"name":"陈张扬"},{"$set":{"score":130}},false,false);
+
+db.person.insert({"name":"liurong","age":33,"score":100})
+db.person.update({"name":"liurong"},{"$set":{"score":120}},false,true);
+db.person.update({"name":"zhangsan"},{"$set":{"score":120}},true,true);
+
+
+
+db.person.update({"name":"zhangsan"},{"$inc":{"score":20}})   //给score字段加20分
+db.person.insert({"name":"xixi","score":90,"curse":["英语","数学","语文"]})
+db.person.update({"name":"xixi"},{"$push":{"curse":"美术"}})
+
+db.person.update({"name":"xixi"},{"$pushAll":{"curse":["音乐","跳舞"]}})
+
+db.person.update({"name":"xixi"},{"$addToSet":{"curse":"跑步"}})
+db.person.update({"name":"xixi"},{"$pop":{"curse":-1}})
+
+db.person.update({"name":"xixi"},{"$pull":{"curse":"跑步"}})
+
+db.person.update({"name":"xixi"},{"$pullAll":{"curse":["跑步","数学"]}})
+db.person.update({"name":"xixi"},{"$pop":{"curse":-1}})
+db.person.update({"name":"xixi"},{"$rename":{"curse":"newCurse"}})
+db.person.update({"name":{"$regex":/liu/i}},{"$rename":{"score":"newScore"}},true,true)
+
+
+
+db.person.ensureIndex({"name":1})
+db.person.find({"name":"liurong"}).explain();
+db.person.find({"score":90}).explain();
+db.person.ensureIndex({"score":1},{name:"score_index_1"})
+
+db.person.getIndexes();
+db.person.dropIndex({"score":1})
+db.person.dropIndex({"name":-1});
+db.person.ensureIndex({"name":-1},{name:"name_index_-1"},{"unique":true});
+db.person.remove({"name":/liurong/i})
+
+db.person.find({"name":"xixi"}).explain();
+db.person.ensureIndex({"name":-1},{"unique":true});
+db.person.remove({"name":"liurong"})
+
+
+db.emp.insert({"name":"张三","age":30,"sex":"男","job":"clear","salary":1000});
+db.emp.insert({"name":"李四","age":31,"sex":"女","job":"manager","salary":8000});
+db.emp.insert({"name":"王五","age":30,"sex":"女","job":"clear","salary":2000});
+db.emp.insert({"name":"赵六","age":31,"sex":"男","job":"clear","salary":1000});
+db.emp.insert({"name":"孙七","age":32,"sex":"男","job":"manager","salary":3000});
+db.emp.insert({"name":"王八","age":31,"sex":"女","job":"leader","salary":1000});
+db.emp.insert({"name":"杨九","age":30,"sex":"男","job":"clear","salary":1000});
+db.emp.insert({"name":"刘十","age":32,"sex":"男","job":"leader","salary":3000});
+
+
+
+
+db.person.insert({"name":"liurong","age":23})
+db.person.dropIndex({"name":-1})
+
+db.runCommand({"distinct":"students","key":"name"})
+db.runCommand({"distinct":"person","key":"name"})
+
+
+//聚合框架
+db.emp.aggregate([{"$group":{"_id":"$job",job_count:{"$sum":1}}}]); //加$符号表示引入内容
+
+db.emp.aggregate([{"$group":{"_id":"$job",job_sal:{"$sum":"$salary"}}}]);
+
+db.emp.aggregate([{"$group":{"_id":"$job",
+job_count:{"$sum":1},     //按job分组，求出总人数
+job_sal:{"$sum":"$salary"}, //求出总工资
+job_avg:{"$avg":"$salary"}, //求出平均工资
+}}]);  
+
+
+db.emp.aggregate([{"$group":{"_id":"$job",max_sal:{"$max":"$salary"}}}]);
+db.emp.aggregate([{"$group":{"_id":"$job",min_sal:{"$min":"$salary"}}}]);
+
+
+db.emp.aggregate({"$group":{"_id":"$job","job_salary":{"$push":"$salary"}}})
+db.emp.aggregate({"$group":{"_id":"$job","job_salary":{"$push":"$name"}}})   //每个职位的人员
+db.emp.aggregate({"$group":{"_id":"$job","job_salary":{"$first":"$name"}}})   //每个职位的人员
+db.emp.aggregate({"$group":{"_id":"$job","job_salary":{"$last":"$name"}}})
+#所有的分组都是无序的。
+
+#利用project来控制列的显示
+
+db.emp.aggregate([{"$project":{"_id":1,"name":1}}])
+db.emp.aggregate([{"$project":{"name":1,"salary":{"年薪":{"$multiply":["$salary",12]}}}}]).pretty()
+db.emp.aggregate([{}])
+db.emp.aggregate([{}])
+
+db.emp.aggregate({"$sort":{"age":-1,"salary":1}})
+
+
+var jobMapFun=function(){
+	emit(this.job,this.name);
+}
+var jobReduceFun=function(key,values){
+	return {"job":key,"names":values};
+}
+
+
+db.runCommand({
+	"mapreduce":"emp" ,
+	"map":jobMapFun,
+	"reduce":jobReduceFun,
+	"out":"t_job_emp"
+})
+
+
+var sexMapFun=function(){
+	emit(this.sex,{
+		"count":1,
+		"avg":this.salary,
+		"cmax":this.salary,
+		"cmin":this.salary,
+		"name":this.name
+	});
+}
+
+var sexReduceFun=function(key,values){
+	var total=0;
+	var sum=0;
+	var maxSalary=values[0].cmax;
+	var mixSalary=values[0].cmin;
+	var names=new Array();
+	for(var x in values){
+		total+=values[x].count;
+		sum+=values[x].cmax;
+		if(maxSala<values[x].cmax){
+			maxSalary=values[x].cmax;
+		}
+		if(mixSalary>values[x].cmin){
+			mixSalary=values[x].cmin;
+		}
+		names[x]=values[x].name;
+	}
+	var avgSalary=(sum/total).toFixed(2);
+	return {"total":total,"names":names,"sum":sum,"maxSalary":maxSalary,
+				"mixSalary":mixSalary,"avgSalary":avgSalary}
+}
+
+
+db.runCommand({
+	"mapreduce":"emp",
+	"map":sexMapFun,
+	"reduce":sexReduceFun,
+	"out":"t_sex_emp"
+})
+
+db.emp.aggregate({"$sort":{"age":-1,"salary":-1}})
+
+db.emp.aggregate([{"$project":{"name":1,"salary":1}},
+				{"$skip":2},
+				{"$limit":2}])
+
+db.emp.aggregate({"$project":{"_id":0,"salary":1,"name":1}},
+				{"$out":"t_emp.out"})
+				
+				
+#固定集合的大小是指，集合的大小不变，当数据量太大的时候，原来的集合中的数据被删除
+
+db.createCollection("dept",{"capped":true,"size":1024,"max":5});
+db.dept.insert({"deptno":10,"name":"技术部","loc":"上海"})
+db.dept.insert({"deptno":11,"name":"开发部","loc":"北京"})
+db.dept.insert({"deptno":12,"name":"市场部","loc":"广州"})
+db.dept.insert({"deptno":13,"name":"管理部","loc":"杭州"})
+db.dept.insert({"deptno":14,"name":"保安部","loc":"深圳"})
+db.dept.insert({"deptno":15,"name":"公关部","loc":"长沙"})
+
+
+db.createUser({
+	"user":"admin",
+	"pwd":"admin",
+	"roles":[{"role":"readWrite","db":"mldn"}]
+})
+
+
+mongo localhost:27017/mldn -u admin -p admin
+
+#修改密码先关闭授权登录
+mongo.changeUserPassword("admin":"admin");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

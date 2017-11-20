@@ -1,0 +1,7 @@
+
+
+db.person.insert({"name":"liurong","age":23})
+db.person.dropIndex({"name":-1})
+
+db.runCommand({"distinct":"students","key":"name"})
+db.runCommand({"distinct":"person","key":"name"})

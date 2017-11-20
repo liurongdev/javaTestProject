@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <!--表示的版本号 -->
+  <modelVersion>4.0.0</modelVersion>
+  <!-- 表示的是开发项目的组织名称 -->
+  <groupId>cn.mldn</groupId>
+  <!-- 开发的模块名称 -->  
+  <artifactId>util</artifactId>
+  <!-- 模块的版本 -->
+  <version>0.0.1-SNAPSHOT</version>
+  <!-- 表示的是最终打包的文件形式 -->
+  <packaging>jar</packaging>
+
+  <name>util</name>
+  <!-- 表示的远程仓库的名字 -->
+  <url>http://maven.apache.org</url>
+
+  <properties>
+  	<!-- 定义项目的源文件使用的编码 -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+  	<!-- 表示的是该组件的依赖库关系 -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
+	<dependency>
+   	 	<groupId>javax.mail</groupId>
+    	<artifactId>javax.mail-api</artifactId>
+    	<version>1.6.0</version>
+	</dependency>
+  </dependencies>
+</project>
